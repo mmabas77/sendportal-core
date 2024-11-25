@@ -66,7 +66,9 @@ class SmtpAdapter extends BaseMailAdapter
         );
 
         $this->transport = $factory->create($dsn);
-
+        $this->transport->getStream()->setStreamOptions([
+        'ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]
+        ]);
         return $this->transport;
     }
 
