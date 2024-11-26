@@ -3,7 +3,6 @@
 namespace Sendportal\Base\Adapters;
 
 use Illuminate\Support\Arr;
-use jdavidbakr\MailTracker\Model\SentEmail;
 use Sendportal\Base\Services\Messages\MessageTrackingOptions;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Mailer;
@@ -24,20 +23,13 @@ class SmtpAdapter extends BaseMailAdapter
 
     public function send(string $fromEmail, string $fromName, string $toEmail, string $subject, MessageTrackingOptions $trackingOptions, string $content): string
     {
-        $failedRecipients = [];
         try {
-            $mt = new \jdavidbakr\MailTracker\MailTracker();
-            $this->resolveClient()->registerPlugin($mt);
-            $rmsg = $this->resolveMessage($subject, $content, $fromEmail, $fromName, $toEmail);
-            $this->resolveClient()->send($rmsg, $failedRecipients);
-            $sent_email = SentEmail::where('hash', $mt->getHash())->first();
-            dd($sent_email);
-            return $sent_email->message_id ?? 0;
+            $result = $this->resolveClient()->send($this->resolveMessage($subject, $content, $fromEmail, $fromName, $toEmail));
         } catch (TransportException $e) {
             return $this->resolveMessageId(0);
         }
 
-        return $this->resolveMessageId(0);
+        return $this->resolveMessageId($result);
     }
 
     protected function resolveClient(): Mailer
@@ -61,7 +53,7 @@ class SmtpAdapter extends BaseMailAdapter
 
         $encryption = Arr::get($this->config, 'encryption');
 
-        $scheme = !is_null($encryption) && $encryption === 'tls'
+        $scheme = ! is_null($encryption) && $encryption === 'tls'
             ? ((Arr::get($this->config, 'port') == 465) ? 'smtps' : 'smtp')
             : '';
 
@@ -93,6 +85,6 @@ class SmtpAdapter extends BaseMailAdapter
 
     protected function resolveMessageId($result): string
     {
-        return ($result == 1) ? strval($result) : '-1';
+        return ($result instanceof SentMessage) ? $result->getMessageId() : '-1';
     }
 }
