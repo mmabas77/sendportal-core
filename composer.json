@@ -19,7 +19,7 @@
         "rap2hpoutre/fast-excel": "^5.4",
         "sendgrid/sendgrid": "^8.1",
         "wildbit/postmark-php": "^6.0",
-        "mmabas77/mail-tracker": "dev-master"
+        "jdavidbakr/mail-tracker": "dev-master"
     },
     "repositories": [
             {
