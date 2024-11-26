@@ -31,8 +31,8 @@ class SmtpAdapter extends BaseMailAdapter
             $client = $this->resolveClient();
             // Hook into the mailer
             $tracker = new MailTracker;
-            $client->send($msg);
             $tracker->messageSending(new MessageSending($msg));
+            $client->send($msg);
         } catch (TransportException|TransportExceptionInterface $e) {
             return $this->resolveMessageId(0);
         }
