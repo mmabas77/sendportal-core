@@ -3,6 +3,12 @@
 namespace Sendportal\Base\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use jdavidbakr\MailTracker\Events\ComplaintMessageEvent;
+use jdavidbakr\MailTracker\Events\EmailDeliveredEvent;
+use jdavidbakr\MailTracker\Events\EmailSentEvent;
+use jdavidbakr\MailTracker\Events\LinkClickedEvent;
+use jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent;
+use jdavidbakr\MailTracker\Events\ViewEmailEvent;
 use Sendportal\Base\Events\MessageDispatchEvent;
 use Sendportal\Base\Events\SubscriberAddedEvent;
 use Sendportal\Base\Events\Webhooks\MailgunWebhookReceived;
@@ -12,6 +18,12 @@ use Sendportal\Base\Events\Webhooks\PostmarkWebhookReceived;
 use Sendportal\Base\Events\Webhooks\SendgridWebhookReceived;
 use Sendportal\Base\Events\Webhooks\SesWebhookReceived;
 use Sendportal\Base\Listeners\MessageDispatchHandler;
+use Sendportal\Base\Listeners\SMTPhooks\BouncedEmail;
+use Sendportal\Base\Listeners\SMTPhooks\EmailComplaint;
+use Sendportal\Base\Listeners\SMTPhooks\EmailDelivered;
+use Sendportal\Base\Listeners\SMTPhooks\EmailLinkClicked;
+use Sendportal\Base\Listeners\SMTPhooks\EmailSent;
+use Sendportal\Base\Listeners\SMTPhooks\EmailViewed;
 use Sendportal\Base\Listeners\Webhooks\HandleMailgunWebhook;
 use Sendportal\Base\Listeners\Webhooks\HandleMailjetWebhook;
 use Sendportal\Base\Listeners\Webhooks\HandlePostalWebhook;
@@ -51,6 +63,27 @@ class EventServiceProvider extends ServiceProvider
         SubscriberAddedEvent::class => [
             // ...
         ],
+
+        // MailTracker events ...
+        EmailSentEvent::class => [
+            EmailSent::class,
+        ],
+        ViewEmailEvent::class => [
+            EmailViewed::class,
+        ],
+        LinkClickedEvent::class => [
+            EmailLinkClicked::class,
+        ],
+        EmailDeliveredEvent::class => [
+            EmailDelivered::class,
+        ],
+        ComplaintMessageEvent::class => [
+            EmailComplaint::class,
+        ],
+        PermanentBouncedMessageEvent::class => [
+            BouncedEmail::class,
+        ],
+        // ---------------------
     ];
 
     /**
