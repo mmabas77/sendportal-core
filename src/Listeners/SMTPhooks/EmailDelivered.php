@@ -2,7 +2,10 @@
 
 namespace Sendportal\Base\Listeners\SMTPhooks;
 
+use Illuminate\Support\Facades\Log;
 use jdavidbakr\MailTracker\Events\EmailDeliveredEvent;
+use Sendportal\Base\Models\Message;
+use Sendportal\Base\Services\Webhooks\EmailWebhookService;
 
 class EmailDelivered
 {
@@ -26,6 +29,10 @@ class EmailDelivered
      */
     public function handle(EmailDeliveredEvent $event)
     {
+        Log::log('info', 'Email delivered', ['event' => $event]);
+        $msg = Message::query()->where('message_id', $event->sent_email->getHeader('X-Mailer-Hash'))->first();
+        $emailWebhookService = new EmailWebhookService();
+        $emailWebhookService->handleDelivery($msg->message_id, now());
         // Access the model using $event->sent_email
         // Access the IP address that triggered the event using $event->ip_address
     }
