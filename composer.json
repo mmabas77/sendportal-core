@@ -1,5 +1,5 @@
 {
-    "name": "mettle/sendportal-core",
+    "name": "mmabas77/sendportal-core",
     "homepage": "https://github.com/mettle/sendportal-core",
     "description": "Sendportal core functionality.",
     "type": "library",
@@ -19,7 +19,7 @@
         "rap2hpoutre/fast-excel": "^5.4",
         "sendgrid/sendgrid": "^8.1",
         "wildbit/postmark-php": "^6.0",
-        "jdavidbakr/mail-tracker": "master"
+        "mmabas77/mail-tracker": "dev-master"
     },
     "repositories": [
             {
@@ -32,6 +32,8 @@
         "phpunit/phpunit": "^11.0",
         "roave/security-advisories": "dev-master"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Sendportal\\Base\\": "src",
