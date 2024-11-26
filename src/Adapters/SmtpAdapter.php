@@ -33,11 +33,10 @@ class SmtpAdapter extends BaseMailAdapter
             $tracker = new MailTracker;
             $tracker->messageSending(new MessageSending($msg));
             $client->send($msg);
+            return $this->resolveMessageId($msg->getHeaders()->get('X-Mailer-Hash')->getBody());
         } catch (TransportException|TransportExceptionInterface $e) {
-            return $this->resolveMessageId(0);
+            return $this->resolveMessageId(null);
         }
-
-        return $this->resolveMessageId(1);
     }
 
     protected function resolveClient(): Mailer
@@ -91,8 +90,10 @@ class SmtpAdapter extends BaseMailAdapter
         return $msg;
     }
 
-    protected function resolveMessageId($result): string
+    protected function resolveMessageId($result): ?string
     {
-        return ($result instanceof SentMessage) ? $result->getMessageId() : '-1';
+        if ($result == null)
+            return null;
+        return $result;
     }
 }
