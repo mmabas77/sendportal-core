@@ -35,7 +35,7 @@ class ImportSubscriberService
 
         if (! $subscriber) {
             // If subscriber not found, create a new one
-            return $this->subscribers->store(
+            $subscriber = $this->subscribers->store(
                 $workspaceId,
                 Arr::except($data, ['id', 'tags'])
             );
