@@ -22,24 +22,34 @@ class ImportSubscriberService
      */
     public function import(int $workspaceId, array $data): Subscriber
     {
-        $subscriber = null;
-
-        if (! empty(Arr::get($data, 'id'))) {
-            $subscriber = $this->subscribers->findBy($workspaceId, 'id', $data['id'], ['tags']);
-        }
+        // Attempt to find the subscriber by ID or Email in a single query
+        $subscriber = $this->subscribers->query()
+            ->where('workspace_id', $workspaceId)
+            ->when(!empty($data['id']), function ($query) use ($data) {
+                $query->where('id', $data['id']);
+            }, function ($query) use ($data) {
+                $query->where('email', Arr::get($data, 'email'));
+            })
+            ->with('tags') // Eager load tags for later use
+            ->first();
 
         if (! $subscriber) {
-            $subscriber = $this->subscribers->findBy($workspaceId, 'email', Arr::get($data, 'email'), ['tags']);
+            // If subscriber not found, create a new one
+            return $this->subscribers->store(
+                $workspaceId,
+                Arr::except($data, ['id', 'tags'])
+            );
+        } else {
+            // If found, merge and update tags
+            $existingTags = $subscriber->tags->pluck('id')->toArray();
+            $data['tags'] = array_merge($existingTags, Arr::get($data, 'tags', []));
+            $data['tags'] = array_unique($data['tags']); // Ensure unique tags
         }
 
-        if (! $subscriber) {
-            $subscriber = $this->subscribers->store($workspaceId, Arr::except($data, ['id', 'tags']));
-        }
-
-        $data['tags'] = array_merge($subscriber->tags->pluck('id')->toArray(), Arr::get($data, 'tags'));
-
+        // Update the subscriber (create or update tags, if applicable)
         $this->subscribers->update($workspaceId, $subscriber->id, $data);
 
         return $subscriber;
     }
+
 }
