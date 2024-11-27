@@ -48,6 +48,9 @@ class SubscribersImportController extends Controller
      */
     public function store(SubscribersImportRequest $request): RedirectResponse
     {
+        // Allow max time of infinity to process the import
+        set_time_limit(0);
+
         if ($request->file('file')->isValid()) {
             $filename = Str::random(16) . '.csv';
 
