@@ -23,7 +23,7 @@ class ImportSubscriberService
     public function import(int $workspaceId, array $data): Subscriber
     {
         // Attempt to find the subscriber by ID or Email in a single query
-        $subscriber = $this->subscribers->query()
+        $subscriber = $this->subscribers->getNewInstance()->query()
             ->where('workspace_id', $workspaceId)
             ->when(!empty($data['id']), function ($query) use ($data) {
                 $query->where('id', $data['id']);
