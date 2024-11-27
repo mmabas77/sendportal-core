@@ -132,7 +132,7 @@ class SubscribersImportController extends Controller
     {
         $validator = Validator::make($data, [
             'id' => 'integer',
-            'email' => 'required|email:filter',
+            'email' => 'required|email',
         ]);
 
         if ($validator->fails()) {
